@@ -1,0 +1,6 @@
+{
+  "name": "banking-modules-stage",
+  "private": true,
+  "type": "module",
+  "description": "Stage 5: the banking domain split across modules. Run: node main.js"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "pos-modules-stage",
+  "private": true,
+  "type": "module",
+  "description": "Stage 5: the coffee-shop POS split across modules. Run: node main.ts"
+}
