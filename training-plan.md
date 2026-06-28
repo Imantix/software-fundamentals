@@ -72,9 +72,9 @@ did this fix it?*
 **Memorable framings (use these in the room):**
 
 - **DX / maintainability — write for the next human, because it might be you.**
-  Two classic developer jokes make it stick:
-  > *"Always code as if the person who ends up maintaining your code is a violent psychopath
-  > who knows where you live."*
+  Two classic developer sayings make it stick:
+  > *"Always write code as if the next person to maintain it is a colleague who knows where
+  > you sit — and you'll have to face them tomorrow."*
   >
   > *"When I wrote this, only God and I knew what it did. Now, only God knows."*
   One of those future maintainers is **you, six months from now** — write so you can still
