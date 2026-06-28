@@ -17,10 +17,19 @@ been written differently — and here's why."*
   in parallel domains so you can follow whichever clicks:
   - 🏦 `samples/banking/` — accounts, interest, withdrawals *(complete)*
   - ☕ `samples/pos/` — a coffee-shop point-of-sale *(complete)*
-  - 🎮 `samples/tictactoe/` — built live to demonstrate classes & composition *(in progress)*
+  - 🎮 `samples/tictactoe/` — evolution stages + a **visual** React composition demo
+    (`tictactoe/react-composition/`) *(in progress)*
 
 Each stage file is numbered (`01-procedural` → `08-solid`), runs and prints output, opens by
 naming the pain the previous stage left, and ends with a `// ── Try it ──` experiment.
+
+- **Visual composition demos** (open in a browser, no install):
+  - 🎮 `samples/tictactoe/react-composition/` — encapsulation + composition via
+    `Square → Row → Board`, React-style.
+  - ✨ `samples/p5-particle-system/` — the Coding-Train-style particle system: an emitter
+    that *has-a* list of self-managing particles.
+- **[`resources/coding-train.md`](resources/coding-train.md)** — a curated Coding Train
+  watchlist (classes & composition, plus Daniel Shiffman's best "math → visual code" videos).
 
 ## Running the samples
 

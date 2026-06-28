@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Particle System — Composition &amp; Encapsulation (Coding Train style) ✨</title>
+
+  <!--
+    ========================================================================
+    PARTICLE SYSTEM — the canonical "composition" demo (à la The Coding Train)
+    ------------------------------------------------------------------------
+    The same two ideas as the tic-tac-toe board, but now they MOVE — which
+    makes "an object manages itself" click instantly:
+
+        Emitter  ──HAS-A list of──▶  Particle × many
+
+    • ENCAPSULATION lives in `Particle`: each particle owns its own position,
+      velocity, and lifespan, and knows how to update() and show() ITSELF.
+      Nothing outside reaches in and moves it.
+    • COMPOSITION (HAS-A) lives in `Emitter`: it holds an array of particles
+      and just DELEGATES — "everybody update, everybody show" — then drops the
+      ones that report they're dead. The emitter never does a particle's job.
+
+    Move your mouse to emit. No build step — open this file in a browser.
+    (p5.js loads from a CDN, so the first open needs internet.)
+    ========================================================================
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js"></script>
+  <style>
+    body { margin: 0; background: #0b1020; color: #cbd5e1;
+           font-family: ui-sans-serif, system-ui, sans-serif; overflow: hidden; }
+    .hud { position: fixed; left: 14px; top: 12px; font-size: 12px; line-height: 1.7;
+           pointer-events: none; text-shadow: 0 1px 2px #000; }
+    .hud b { color: #fff; }
+    code { background: #1e293b; padding: 1px 5px; border-radius: 4px; color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="hud">
+    <div><b>Particle System</b> — move the mouse ✨</div>
+    <div><b>Encapsulation:</b> each <code>Particle</code> updates &amp; draws itself.</div>
+    <div><b>Composition:</b> the <code>Emitter</code> just HAS-A list and delegates.</div>
+  </div>
+
+  <script>
+    // ======================================================================
+    // PARTICLE — a self-contained, ENCAPSULATED object.
+    // It owns its position, velocity, and lifespan, and knows how to move and
+    // draw itself. The outside world only ever asks it to update()/show(), and
+    // asks "are you done?" (isDead). It never reaches inside.
+    // ======================================================================
+    class Particle {
+      constructor(x, y) {
+        this.pos = { x, y };
+        // a little random upward/outward kick
+        this.vel = { x: random(-1.2, 1.2), y: random(-3.5, -1) };
+        this.acc = { x: 0, y: 0.06 };          // gravity, owned by the particle
+        this.lifespan = 255;                    // fades out, then "dies"
+        this.size = random(6, 14);
+        this.hue = random(180, 320);
+      }
+
+      update() {                                // the particle moves ITSELF
+        this.vel.x += this.acc.x;
+        this.vel.y += this.acc.y;
+        this.pos.x += this.vel.x;
+        this.pos.y += this.vel.y;
+        this.lifespan -= 3.2;
+      }
+
+      show() {                                  // the particle draws ITSELF
+        noStroke();
+        colorMode(HSB, 360, 100, 100, 255);
+        fill(this.hue, 70, 100, this.lifespan);
+        circle(this.pos.x, this.pos.y, this.size);
+      }
+
+      isDead() {                                // the particle decides when it's done
+        return this.lifespan <= 0;
+      }
+    }
+
+    // ======================================================================
+    // EMITTER — COMPOSITION. It HAS-A list of particles and does nothing a
+    // particle could do for itself. It spawns, then delegates update()/show()
+    // to each one, and removes the dead. That's it. Small and cohesive.
+    // ======================================================================
+    class Emitter {
+      constructor(x, y) {
+        this.origin = { x, y };
+        this.particles = [];                    // ← the "has-a" relationship
+      }
+
+      moveTo(x, y) { this.origin = { x, y }; }
+
+      emit(n) {                                 // build OUT OF small pieces
+        for (let i = 0; i < n; i++) {
+          this.particles.push(new Particle(this.origin.x, this.origin.y));
+        }
+      }
+
+      run() {
+        // iterate backwards so removals don't skip elements
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          const p = this.particles[i];
+          p.update();                           // delegate — the particle does the work
+          p.show();
+          if (p.isDead()) this.particles.splice(i, 1);
+        }
+      }
+    }
+
+    // ======================================================================
+    // SKETCH — wires it together. Notice main() knows almost nothing: it just
+    // tells the emitter where the mouse is and says "run". All behavior lives
+    // inside the composed objects.
+    // ======================================================================
+    let emitter;
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      emitter = new Emitter(width / 2, height / 2);
+    }
+
+    function draw() {
+      background(11, 16, 32, 60);               // slight trail
+      emitter.moveTo(mouseX || width / 2, mouseY || height / 2);
+      emitter.emit(3);
+      emitter.run();
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight);
+    }
+  </script>
+
+  <!--
+    ── Try it (composition/encapsulation exercises) ─────────────────────────
+    1. Add a `Confetti extends Particle` that spins as it falls — override
+       show(). The Emitter doesn't change at all (polymorphism + composition).
+    2. Add a SECOND emitter following the same mouse. The sketch just HAS-A
+       two emitters now — composition all the way up.
+    3. Give Particle a `applyForce(fx, fy)` method and have the Emitter push a
+       gust of wind. The particle still owns its own motion; the emitter only
+       asks. (This is exactly Shiffman's "Nature of Code" forces lesson.)
+  -->
+</body>
+</html>
