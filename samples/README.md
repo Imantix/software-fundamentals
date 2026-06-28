@@ -9,7 +9,7 @@ identical across all three.
 |--------|--------|----------------|--------|
 | 🏦 Banking | `banking/` | Accounts, interest, fees, withdrawals | ✅ complete |
 | ☕ Coffee POS | `pos/` | Orders, items, discounts, payments | ✅ complete |
-| 🎮 Tic-Tac-Toe | `tictactoe/` | Board, moves, win detection, players | 🚧 built live in Session 2 (classes & composition) |
+| 🎮 Tic-Tac-Toe | `tictactoe/` | Board, moves, win detection, players | 🚧 Session 2: stages `01`–`04` + a **visual** [`react-composition/`](tictactoe/react-composition/) demo done; `05`/`07`/`08` to come |
 
 ## The stages (same in every domain)
 
