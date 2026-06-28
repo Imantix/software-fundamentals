@@ -5,11 +5,11 @@ disconnected snippets, you watch **one program get better, stage by stage**, in 
 different domains**. Pick whichever clicks for you — the *construct* being taught is
 identical across all three.
 
-| Domain | Folder | What it models |
-|--------|--------|----------------|
-| 🏦 Banking | `banking/` | Accounts, interest, fees, withdrawals |
-| ☕ Coffee POS | `pos/` | Orders, items, discounts, payments |
-| 🎮 Tic-Tac-Toe | `tictactoe/` | Board, moves, win detection, players |
+| Domain | Folder | What it models | Status |
+|--------|--------|----------------|--------|
+| 🏦 Banking | `banking/` | Accounts, interest, fees, withdrawals | ✅ complete |
+| ☕ Coffee POS | `pos/` | Orders, items, discounts, payments | ✅ complete |
+| 🎮 Tic-Tac-Toe | `tictactoe/` | Board, moves, win detection, players | 🚧 built live in Session 2 (classes & composition) |
 
 ## The stages (same in every domain)
 

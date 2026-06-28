@@ -11,6 +11,17 @@ shaped the way they are.
 **Language for examples:** JavaScript / TypeScript (with historical references to the
 languages where each idea was actually born).
 
+**Companion code:** every stage has a **runnable** counterpart under `samples/` — the same
+evolution told in three domains (🏦 banking, ☕ coffee-shop POS, 🎮 tic-tac-toe). They run on
+plain Node 23+ with no build step (`node samples/banking/03-functions.ts`). The snippets in
+*this* plan are deliberately short illustrations; the `samples/` are the full, tested code.
+See `samples/README.md`.
+
+> **One gotcha worth knowing:** the samples avoid TypeScript *parameter properties*
+> (`constructor(private x: T)`) and `enum`s, because Node's built-in TS runner only *strips*
+> types — it won't generate the code those features need. Plan snippets follow the same
+> erasable-only style so they stay copy-paste runnable.
+
 ---
 
 ## Why This Course Exists — The AI-Era Mandate
@@ -96,8 +107,24 @@ and of keeping a **human able to verify** what the machine produced.
 | 8 | **SOLID** | OO done badly still rots | Robert C. Martin (~2000s) |
 | 9 | Capstone: walk the whole evolution | Synthesis | — |
 
-**Total: ~8–10 days** (each module is self-contained; history sections can be lectures,
-code sections are hands-on).
+The modules are the *syllabus*. They're delivered as **short live sessions** (≈1 hour each)
+plus hands-on exercises between them — not a fixed 8–10 day block. Map below.
+
+---
+
+## Delivery — Session Map
+
+| Session | Covers (modules) | Hands-on exercise |
+|---------|------------------|-------------------|
+| **1 — done** | The AI-era mandate; history (binary→assembly→languages); procedural → loops → functions (walk the runnable banking samples); namespaces; cohesion/coupling; **encapsulation, abstraction, interface-vs-abstract-class** (Modules 0–5, 7-core) | **Banking App** — `deposit`, `withdraw`, `checkBalance` (applies classes + encapsulation; reference solution: `samples/banking/04-classes.ts`) |
+| **2 — next** | **Classes & composition**, live — building **tic-tac-toe** from scratch (`Cell` → `Board` → `Game` → `Player`), demonstrating HAS-A composition and delegation | Extend the game: add a second `Player` type, or input validation |
+| **3+** | Inheritance & polymorphism in depth; then **SOLID** (Module 8) on the real domains | Refactor a "God class" one principle at a time |
+| **Later** | **Capstone** (Module 9); then algorithm practice (LeetCode — *think*, don't AI it); then a complex full-stack app mixing everything | Progressive |
+
+> **On the Banking App exercise:** it's the perfect Module-4 exercise — `deposit`/`withdraw`/
+> `checkBalance` forces the learner to put the invariant (no overdraft, no negative deposit)
+> *inside* the class so no caller can break it. That's encapsulation felt, not just heard.
+> Encourage them to write it *before* looking at `04-classes.ts`.
 
 ---
 
@@ -443,10 +470,12 @@ matching co-pilot.
 
 1. **Encapsulation** — hide internals, expose only what the *user of the class* needs. →
    *Robustness:* invalid states impossible from outside. Worked example: an
-   `InterestCalculator`. It can do simple *or* compound interest, with private helpers
-   (`#round`, a `#print` formatter) that no caller should see. You expose `calculate(...)`;
-   you hide *how*. **You're a designer deciding the public API** — keep it relevant to the
-   people who'll use it, and make everything else `#private`.
+   `InterestCalculator`. It can do simple *or* compound interest, with private state
+   (`#principal`, `#rate`) and a private helper (`#round`) that no caller should see — plus
+   validation in the constructor so an invalid calculator can't even be built. You expose
+   `simpleInterest(...)` / `compoundInterest(...)`; you hide *how*. **You're a designer
+   deciding the public API** — keep it relevant to the people who'll use it, everything else
+   `#private`. (Full runnable version: `samples/banking/07a-encapsulation.ts`.)
    ```ts
    class InterestCalculator {
      #principal: number; #rate: number;
@@ -487,6 +516,41 @@ matching co-pilot.
 **Key bridge to SOLID:** Polymorphism + abstraction are what let code be *extended without
 modification*. Hold that thought — it's literally the next module.
 
+### Composition vs. Inheritance — "HAS-A" beats "IS-A"
+
+The four pillars include inheritance (an "**IS-A**" relationship: a `SavingsAccount` *is an*
+`Account`). But inheritance is overused. The everyday workhorse of OO design is
+**composition** — building an object *out of* other objects it **HAS**:
+
+- **Inheritance (IS-A):** `class SavingsAccount extends Account` — reuse by *becoming* a kind
+  of the parent. Powerful, but it **tightly couples** the child to the parent's internals,
+  and you only get one parent.
+- **Composition (HAS-A):** an object holds other objects as fields and delegates to them.
+  Looser, more flexible, and you can recombine pieces freely.
+
+**Worked example — tic-tac-toe (the next working session):**
+
+```ts
+class Cell { /* knows only its own mark: "X" | "O" | "" */ }
+class Board {
+  #cells: Cell[];        // a Board HAS-A grid of Cells   (composition)
+}
+class Game {
+  #board: Board;         // a Game HAS-A Board            (composition)
+  #players: Player[];    // a Game HAS some Players        (composition)
+}
+```
+
+A `Game` is **not** a `Board` and **not** a `Player` — so inheritance would be wrong. A `Game`
+*has* a `Board` and *has* `Players`, and **delegates** to them (`game` asks `board` to place a
+mark; `board` asks the `cell`). That's composition: each class stays small, cohesive, and
+independently testable, and you can swap a piece (e.g. a different `Player`) without touching
+the rest.
+
+**The guideline — "favor composition over inheritance":** reach for inheritance only when
+there's a genuine *is-a* relationship *and* you want the subtype usable wherever the base is
+(that's Module 8's Liskov rule). For everything else — which is most things — **compose**.
+
 ### Interface vs. Abstract Class (the standard interview question)
 
 These get confused constantly, so make the distinction crisp — it's asked in almost every
@@ -519,6 +583,8 @@ tangled, fragile OO just as easily as good OO. By the late 1990s, **Robert C. Ma
 that name the specific failure modes and their cures.
 
 Teach each as: **the smell → the principle → the fix**, and tie back to coupling/cohesion.
+The one-liners below are quick mnemonics; the **runnable** versions apply all five to the
+real domains — `samples/banking/08-solid.ts` and `samples/pos/08-solid.ts`.
 
 ### S — Single Responsibility Principle
 *A class should have one reason to change.* (→ high **cohesion**)
@@ -538,9 +604,13 @@ class PayPal implements PaymentMethod { pay(a: number) {/*...*/} }
 
 ### L — Liskov Substitution Principle
 *A subtype must be usable anywhere its base is, with no surprises.*
-**Smell:** `Penguin extends Bird` but `fly()` throws — substitution breaks callers.
-**Fix:** Don't force a subclass into a contract it can't honor. Inheritance is a *promise*,
-not just code reuse. (→ keeps **coupling** honest.)
+**Smell (toy mnemonic):** `Penguin extends Bird` but `fly()` throws — substitution breaks callers.
+**Smell (real):** `FixedDepositAccount extends Account`, but `withdraw()` throws before the
+maturity date. Any code that holds an `Account` and calls `withdraw()` now breaks when handed
+a fixed deposit — the subtype isn't truly substitutable.
+**Fix:** Don't force a subclass into a contract it can't honor (here: don't make a
+non-withdrawable account a subtype of a withdrawable one — *compose* or model it differently).
+Inheritance is a *promise*, not just code reuse. (→ keeps **coupling** honest.)
 
 ### I — Interface Segregation Principle
 *Don't force a class to implement methods it doesn't use.*
@@ -554,7 +624,10 @@ implement `fax()`.
 **Fix:** Depend on a `Database` interface; inject the concrete one from outside.
 ```ts
 interface Database { save(x: unknown): void; }
-class OrderService { constructor(private db: Database) {} }  // real DB or fake, same code
+class OrderService {
+  #db: Database;
+  constructor(db: Database) { this.#db = db; }  // real DB or fake injected — same code
+}
 ```
 
 **The synthesis:** SOLID is not five random rules — it's five named tactics for achieving
